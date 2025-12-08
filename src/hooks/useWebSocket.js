@@ -14,7 +14,7 @@ export default function useWebSocket({
     const connect = useCallback(() => {
         // 根据环境自动选择 WebSocket 地址
         const wsUrl = import.meta.env.PROD
-            ? 'wss://websocket-chat-server.onrender.com' // 生产环境（部署后需要修改为你的实际域名）
+            ? 'wss://https://websocket-chat-cwkj.onrender.com' // 生产环境（部署后需要修改为你的实际域名）
             : 'ws://localhost:3001' // 开发环境
 
         const ws = new WebSocket(wsUrl)
