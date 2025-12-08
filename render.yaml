@@ -1,9 +1,9 @@
 services:
-  # WebSocket 服务器
+  # WebSocket 服务器 + 前端
   - type: web
     name: websocket-chat-server
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
