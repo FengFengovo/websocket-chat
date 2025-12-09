@@ -32,6 +32,11 @@ function generateRoomCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+// 验证房间号格式（英文数字混合，3-12位）
+function isValidRoomCode(code) {
+    return /^[A-Z0-9]{3,12}$/.test(code);
+}
+
 // 广播消息到房间内所有用户
 function broadcastToRoom(roomCode, message, excludeWs = null) {
     const room = rooms.get(roomCode);
@@ -54,9 +59,44 @@ wss.on('connection', (ws) => {
             switch (message.type) {
                 case 'create_room':
                     // 创建房间
-                    const roomCode = generateRoomCode();
+                    let roomCode;
+
+                    // 如果提供了自定义房间号
+                    if (message.customRoomCode) {
+                        const customCode = message.customRoomCode.toUpperCase();
+
+                        // 验证格式
+                        if (!isValidRoomCode(customCode)) {
+                            ws.send(JSON.stringify({
+                                type: 'error',
+                                message: '房间号格式不正确，请使用3-12位英文字母或数字'
+                            }));
+                            break;
+                        }
+
+                        // 检查是否已存在
+                        if (rooms.has(customCode)) {
+                            ws.send(JSON.stringify({
+                                type: 'error',
+                                message: '该房间号已被使用，请换一个'
+                            }));
+                            break;
+                        }
+
+                        roomCode = customCode;
+                    } else {
+                        // 生成随机房间号
+                        roomCode = generateRoomCode();
+                        // 确保不重复
+                        while (rooms.has(roomCode)) {
+                            roomCode = generateRoomCode();
+                        }
+                    }
+
                     rooms.set(roomCode, {
                         code: roomCode,
+                        password: message.password || null, // 存储密码
+                        persistent: true, // 标记为持久化房间
                         clients: new Set([ws]),
                         users: [{ id: message.userId, name: message.userName, avatar: message.userAvatar }]
                     });
@@ -70,13 +110,24 @@ wss.on('connection', (ws) => {
                         roomCode: roomCode,
                         users: [{ id: message.userId, name: message.userName, avatar: message.userAvatar }]
                     }));
-                    console.log(`房间 ${roomCode} 已创建`);
+                    console.log(`房间 ${roomCode} 已创建${message.password ? '（有密码）' : ''}`);
                     break;
 
                 case 'join_room':
                     // 加入房间
                     const room = rooms.get(message.roomCode);
                     if (room) {
+                        // 验证密码
+                        if (room.password) {
+                            if (!message.password || message.password !== room.password) {
+                                ws.send(JSON.stringify({
+                                    type: 'error',
+                                    message: '密码错误'
+                                }));
+                                break;
+                            }
+                        }
+
                         room.clients.add(ws);
                         room.users.push({ id: message.userId, name: message.userName, avatar: message.userAvatar });
                         ws.roomCode = message.roomCode;
@@ -202,9 +253,14 @@ wss.on('connection', (ws) => {
                 room.users = room.users.filter(u => u.id !== ws.userId);
 
                 if (room.clients.size === 0) {
-                    // 房间无人，删除房间
-                    rooms.delete(ws.roomCode);
-                    console.log(`房间 ${ws.roomCode} 已删除`);
+                    // 如果是持久化房间，保留房间但清空用户列表
+                    if (room.persistent) {
+                        console.log(`房间 ${ws.roomCode} 无人但保持存在（持久化房间）`);
+                    } else {
+                        // 非持久化房间，删除
+                        rooms.delete(ws.roomCode);
+                        console.log(`房间 ${ws.roomCode} 已删除`);
+                    }
                 } else {
                     // 通知其他用户
                     broadcastToRoom(ws.roomCode, {

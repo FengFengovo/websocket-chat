@@ -8,6 +8,9 @@ function App() {
   const [view, setView] = useState('home') // home, chat
   const [userName, setUserName] = useState('')
   const [roomCode, setRoomCode] = useState('')
+  const [customRoomCode, setCustomRoomCode] = useState('') // 自定义房间号
+  const [roomPassword, setRoomPassword] = useState('') // 创建房间时的密码
+  const [joinPassword, setJoinPassword] = useState('') // 加入房间时的密码
   const [currentRoomCode, setCurrentRoomCode] = useState('')
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
@@ -92,7 +95,9 @@ function App() {
           type: 'create_room',
           userId: userId,
           userName: userName,
-          userAvatar: userAvatar
+          userAvatar: userAvatar,
+          customRoomCode: customRoomCode.trim() || undefined,
+          password: roomPassword.trim() || undefined
         })
       } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
         clearInterval(checkConnection)
@@ -137,7 +142,8 @@ function App() {
           roomCode: roomCode.toUpperCase(),
           userId: userId,
           userName: userName,
-          userAvatar: userAvatar
+          userAvatar: userAvatar,
+          password: joinPassword.trim() || undefined
         })
       } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
         clearInterval(checkConnection)
@@ -199,6 +205,9 @@ function App() {
     setUsers([])
     setCurrentRoomCode('')
     setRoomCode('')
+    setCustomRoomCode('')
+    setRoomPassword('')
+    setJoinPassword('')
   }
 
   return (
@@ -209,6 +218,12 @@ function App() {
           setUserName={setUserName}
           roomCode={roomCode}
           setRoomCode={setRoomCode}
+          customRoomCode={customRoomCode}
+          setCustomRoomCode={setCustomRoomCode}
+          roomPassword={roomPassword}
+          setRoomPassword={setRoomPassword}
+          joinPassword={joinPassword}
+          setJoinPassword={setJoinPassword}
           userAvatar={userAvatar}
           setUserAvatar={setUserAvatar}
           isCustomAvatar={isCustomAvatar}

@@ -9,6 +9,12 @@ export default function HomePage({
   setUserName, 
   roomCode, 
   setRoomCode,
+  customRoomCode,
+  setCustomRoomCode,
+  roomPassword,
+  setRoomPassword,
+  joinPassword,
+  setJoinPassword,
   userAvatar,
   setUserAvatar,
   isCustomAvatar,
@@ -54,6 +60,30 @@ export default function HomePage({
           />
         </div>
         
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">自定义房间号（可选）</label>
+          <Input
+            type="text"
+            placeholder="留空则随机生成，支持英文数字"
+            value={customRoomCode}
+            onChange={(e) => setCustomRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+            maxLength={12}
+            className="h-12 uppercase"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">房间密码（可选）</label>
+          <Input
+            type="password"
+            placeholder="留空则无需密码"
+            value={roomPassword}
+            onChange={(e) => setRoomPassword(e.target.value)}
+            maxLength={20}
+            className="h-12"
+          />
+        </div>
+        
         <Button 
           className="w-full h-12 text-base bg-blue-600 hover:bg-blue-700"
           onClick={onCreateRoom}
@@ -82,14 +112,26 @@ export default function HomePage({
         </div>
         
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">房间码</label>
+          <label className="text-sm font-medium text-gray-700">房间号</label>
           <Input
             type="text"
-            placeholder="输入房间码"
+            placeholder="输入房间号"
             value={roomCode}
-            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-            maxLength={6}
+            onChange={(e) => setRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+            maxLength={12}
             className="h-12 uppercase"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">房间密码（如有）</label>
+          <Input
+            type="password"
+            placeholder="如果房间有密码请输入"
+            value={joinPassword}
+            onChange={(e) => setJoinPassword(e.target.value)}
+            maxLength={20}
+            className="h-12"
           />
         </div>
         
