@@ -122,47 +122,37 @@ export default function MessageList({ messages, userId }) {
                       <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 min-w-[200px] sm:min-w-[250px]">
                         {/* 如果是图片，显示图片预览 */}
                         {msg.file.type && msg.file.type.startsWith('image/') ? (
-                          <div className="space-y-2">
-                            <div className="relative group">
-                              <img 
-                                src={msg.file.data} 
-                                alt={msg.file.name}
-                                className="rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                                style={{
-                                  maxHeight: imageDimensions[index]?.isLongImage ? '150px' : '300px',
-                                  width: imageDimensions[index]?.isLongImage ? '400px' : 'auto',
-                                  maxWidth: imageDimensions[index]?.isLongImage ? '400px' : '100%',
-                                  objectFit: 'cover'
-                                }}
-                                onClick={() => handleImageClick(msg.file)}
-                                onLoad={() => checkImageDimensions(msg.file.data, index)}
-                              />
-                              {/* 悬停提示 */}
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-70 px-3 py-1.5 rounded-full">
-                                  <p className="text-white text-xs flex items-center gap-1">
-                                    <ImageIcon className="w-3 h-3" />
-                                    点击查看大图
-                                  </p>
-                                </div>
+                          <div className="relative group">
+                            <img 
+                              src={msg.file.data} 
+                              alt={msg.file.name}
+                              className="rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                              style={{
+                                maxHeight: imageDimensions[index]?.isLongImage ? '150px' : '300px',
+                                width: imageDimensions[index]?.isLongImage ? '400px' : 'auto',
+                                maxWidth: imageDimensions[index]?.isLongImage ? '400px' : '100%',
+                                objectFit: 'cover'
+                              }}
+                              onClick={() => handleImageClick(msg.file)}
+                              onLoad={() => checkImageDimensions(msg.file.data, index)}
+                            />
+                            {/* 悬停提示 */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-70 px-3 py-1.5 rounded-full">
+                                <p className="text-white text-xs flex items-center gap-1">
+                                  <ImageIcon className="w-3 h-3" />
+                                  点击查看大图
+                                </p>
                               </div>
-                              {/* 长图提示 */}
-                              {imageDimensions[index]?.isLongImage && (
-                                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 px-3 py-1 rounded-full">
-                                  <p className="text-white text-xs flex items-center gap-1">
-                                    <ImageIcon className="w-3 h-3" />
-                                    长图
-                                  </p>
-                                </div>
-                              )}
                             </div>
-                            {/* 图片文件名（可选显示） */}
-                            {msg.file.name && (
-                              <p className={`text-xs px-2 truncate ${
-                                msg.userId === userId ? 'text-blue-100' : 'text-gray-500'
-                              }`}>
-                                {msg.file.name}
-                              </p>
+                            {/* 长图提示 */}
+                            {imageDimensions[index]?.isLongImage && (
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 px-3 py-1 rounded-full">
+                                <p className="text-white text-xs flex items-center gap-1">
+                                  <ImageIcon className="w-3 h-3" />
+                                  长图
+                                </p>
+                              </div>
                             )}
                           </div>
                         ) : (
