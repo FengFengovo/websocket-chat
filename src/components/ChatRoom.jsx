@@ -28,6 +28,28 @@ export default function ChatRoom({
   onLeaveRoom,
   fileUploadRef
 }) {
+  // 处理粘贴事件
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    // 遍历粘贴的内容
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      
+      // 检查是否为图片
+      if (item.type.indexOf('image') !== -1) {
+        e.preventDefault() // 阻止默认粘贴行为
+        
+        const file = item.getAsFile()
+        if (file) {
+          // 直接调用文件发送函数
+          onSendFile(file)
+        }
+        break
+      }
+    }
+  }
   return (
     <div className="w-full max-w-6xl h-[100vh] sm:h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       {/* 聊天室头部 */}
@@ -91,9 +113,10 @@ export default function ChatRoom({
           <div className="flex gap-2 sm:gap-3">
             <Input
               type="text"
-              placeholder="输入消息..."
+              placeholder="输入消息或粘贴图片..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
+              onPaste={handlePaste}
               className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
             />
             <Button 
