@@ -238,6 +238,18 @@ wss.on('connection', (ws) => {
                         ws.send(JSON.stringify(chatMessage));
                     }
                     break;
+
+                case 'typing':
+                    // 正在输入提示
+                    if (ws.roomCode) {
+                        broadcastToRoom(ws.roomCode, {
+                            type: 'typing',
+                            userId: ws.userId,
+                            userName: ws.userName,
+                            isTyping: message.isTyping
+                        }, ws);
+                    }
+                    break;
             }
         } catch (error) {
             console.error('消息处理错误:', error);

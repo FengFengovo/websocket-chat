@@ -17,6 +17,8 @@ import {
   getIsCustomAvatar,
   saveIsCustomAvatar
 } from '@/utils/storage'
+import { getTheme, saveTheme, applyTheme } from '@/utils/theme'
+import { requestNotificationPermission, sendNotification } from '@/utils/notification'
 
 function App() {
   const [view, setView] = useState('home') // home, chat
@@ -37,6 +39,11 @@ function App() {
   const [isCustomAvatar, setIsCustomAvatar] = useState(() => getIsCustomAvatar()) // 从本地存储读取
   const fileUploadRef = useRef(null) // FileUpload组件的ref
   const [isConnecting, setIsConnecting] = useState(false) // 连接状态
+  const [typingUsers, setTypingUsers] = useState(new Map()) // 正在输入的用户
+  const typingTimeoutRef = useRef(new Map()) // 输入超时定时器
+  const [theme, setTheme] = useState(() => getTheme()) // 主题状态
+  const [notificationEnabled, setNotificationEnabled] = useState(false) // 通知是否启用
+  const isWindowFocused = useRef(true) // 窗口是否聚焦
 
   // 监听用户名变化，自动保存到本地存储
   useEffect(() => {
@@ -56,6 +63,51 @@ function App() {
   useEffect(() => {
     saveIsCustomAvatar(isCustomAvatar)
   }, [isCustomAvatar])
+
+  // 初始化主题
+  useEffect(() => {
+    applyTheme(theme)
+  }, [])
+
+  // 监听主题变化
+  useEffect(() => {
+    applyTheme(theme)
+    saveTheme(theme)
+  }, [theme])
+
+  // 切换主题
+  const handleToggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+  }
+
+  // 监听窗口焦点
+  useEffect(() => {
+    const handleFocus = () => {
+      isWindowFocused.current = true
+    }
+    const handleBlur = () => {
+      isWindowFocused.current = false
+    }
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('blur', handleBlur)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('blur', handleBlur)
+    }
+  }, [])
+
+  // 请求通知权限
+  const handleEnableNotification = async () => {
+    const granted = await requestNotificationPermission()
+    setNotificationEnabled(granted)
+    if (granted) {
+      showAlert("通知已启用", "你将收到新消息通知", "default")
+    } else {
+      showAlert("通知被拒绝", "请在浏览器设置中允许通知", "destructive")
+    }
+  }
 
   // WebSocket Hook
   const { connect, send, close } = useWebSocket({
@@ -86,6 +138,12 @@ function App() {
         message: `${data.userName} 离开了房间`,
         timestamp: Date.now()
       }])
+      // 清除该用户的输入状态
+      setTypingUsers(prev => {
+        const newMap = new Map(prev)
+        newMap.delete(data.userId)
+        return newMap
+      })
     },
     onChatMessage: (data) => {
       setMessages(prev => [...prev, {
@@ -98,9 +156,67 @@ function App() {
         timestamp: data.timestamp
       }])
       
+      // 清除该用户的输入状态
+      setTypingUsers(prev => {
+        const newMap = new Map(prev)
+        newMap.delete(data.userId)
+        return newMap
+      })
+      
+      // 如果不是自己发送的消息，且窗口未聚焦，发送通知
+      if (data.userId !== userId && notificationEnabled && !isWindowFocused.current) {
+        const messagePreview = data.file 
+          ? `[${data.file.type.startsWith('image/') ? '图片' : '文件'}]` 
+          : data.message.substring(0, 50)
+        
+        sendNotification(`${data.userName} 发来新消息`, {
+          body: messagePreview,
+          tag: 'chat-message'
+        })
+      }
+      
       // 如果是文件消息且是自己发送的，通知FileUpload组件完成上传
       if (data.file && data.userId === userId && fileUploadRef.current) {
         fileUploadRef.current.completeUpload(data.file.fileId)
+      }
+    },
+    onTyping: (data) => {
+      if (data.isTyping) {
+        // 用户正在输入
+        setTypingUsers(prev => {
+          const newMap = new Map(prev)
+          newMap.set(data.userId, data.userName)
+          return newMap
+        })
+        
+        // 清除之前的超时定时器
+        if (typingTimeoutRef.current.has(data.userId)) {
+          clearTimeout(typingTimeoutRef.current.get(data.userId))
+        }
+        
+        // 3秒后自动清除输入状态
+        const timeout = setTimeout(() => {
+          setTypingUsers(prev => {
+            const newMap = new Map(prev)
+            newMap.delete(data.userId)
+            return newMap
+          })
+          typingTimeoutRef.current.delete(data.userId)
+        }, 3000)
+        
+        typingTimeoutRef.current.set(data.userId, timeout)
+      } else {
+        // 用户停止输入
+        setTypingUsers(prev => {
+          const newMap = new Map(prev)
+          newMap.delete(data.userId)
+          return newMap
+        })
+        
+        if (typingTimeoutRef.current.has(data.userId)) {
+          clearTimeout(typingTimeoutRef.current.get(data.userId))
+          typingTimeoutRef.current.delete(data.userId)
+        }
       }
     },
     onError: (data) => {
@@ -210,11 +326,35 @@ function App() {
     }, 30000)
   }
 
+  // 处理输入变化
+  const handleInputChange = (value) => {
+    setInputMessage(value)
+    
+    // 发送正在输入状态
+    if (value.trim()) {
+      send({
+        type: 'typing',
+        isTyping: true
+      })
+    } else {
+      send({
+        type: 'typing',
+        isTyping: false
+      })
+    }
+  }
+
   // 发送消息
   const handleSendMessage = (e) => {
     e.preventDefault()
     
     if (!inputMessage.trim()) return
+    
+    // 发送停止输入状态
+    send({
+      type: 'typing',
+      isTyping: false
+    })
     
     send({
       type: 'chat_message',
@@ -262,7 +402,7 @@ function App() {
 
   return (
     <>
-    <div className="min-h-screen w-full flex items-center justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       {view === 'home' && (
         <HomePage
           userName={userName}
@@ -282,6 +422,8 @@ function App() {
           onCreateRoom={handleCreateRoom}
           onJoinRoom={handleJoinRoom}
           isConnecting={isConnecting}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
         />
       )}
       
@@ -292,11 +434,16 @@ function App() {
           messages={messages}
           userId={userId}
           inputMessage={inputMessage}
-          setInputMessage={setInputMessage}
+          setInputMessage={handleInputChange}
           onSendMessage={handleSendMessage}
           onSendFile={handleSendFile}
           onLeaveRoom={handleLeaveRoom}
           fileUploadRef={fileUploadRef}
+          typingUsers={typingUsers}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+          notificationEnabled={notificationEnabled}
+          onEnableNotification={handleEnableNotification}
         />
       )}
     </div>
