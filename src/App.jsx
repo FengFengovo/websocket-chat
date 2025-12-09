@@ -202,7 +202,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center sm">
+    <div className="min-h-screen w-full flex items-center justify-center">
       {view === 'home' && (
         <HomePage
           userName={userName}
