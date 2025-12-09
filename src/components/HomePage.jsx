@@ -28,9 +28,6 @@ export default function HomePage({
     <Card className="w-full max-w-md shadow-2xl mx-2 sm:mx-0">
       <CardHeader className="text-center space-y-2 p-4 sm:p-6">
         <div className="flex justify-center mb-2">
-          <div className="bg-blue-600 p-3 rounded-full">
-            <MessageCircle className="w-8 h-8 text-white" />
-          </div>
         </div>
         <CardTitle className="text-2xl sm:text-3xl font-bold text-blue-600">
           实时聊天室
@@ -57,7 +54,7 @@ export default function HomePage({
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             maxLength={20}
-            className="h-12"
+            className="h-10"
           />
         </div>
         
@@ -76,7 +73,7 @@ export default function HomePage({
                 value={customRoomCode}
                 onChange={(e) => setCustomRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                 maxLength={12}
-                className="h-12 uppercase"
+                className="h-10 uppercase"
               />
             </div>
             
@@ -88,12 +85,12 @@ export default function HomePage({
                 value={roomPassword}
                 onChange={(e) => setRoomPassword(e.target.value)}
                 maxLength={20}
-                className="h-12"
+                className="h-10"
               />
             </div>
             
             <Button 
-              className="w-full h-12 text-base bg-blue-600 hover:bg-blue-700"
+              className="w-full h-10 text-base bg-blue-600 hover:bg-blue-700"
               onClick={onCreateRoom}
               disabled={isConnecting || !userName.trim()}
             >
@@ -120,7 +117,7 @@ export default function HomePage({
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                 maxLength={12}
-                className="h-12 uppercase"
+                className="h-10 uppercase"
               />
             </div>
             
@@ -132,13 +129,13 @@ export default function HomePage({
                 value={joinPassword}
                 onChange={(e) => setJoinPassword(e.target.value)}
                 maxLength={20}
-                className="h-12"
+                className="h-10"
               />
             </div>
             
             <Button 
               variant="outline"
-              className="w-full h-12 text-base border-2"
+              className="w-full h-10 text-base border-2"
               onClick={onJoinRoom}
               disabled={isConnecting || !userName.trim() || !roomCode.trim()}
             >

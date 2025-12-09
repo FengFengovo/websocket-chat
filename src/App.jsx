@@ -3,6 +3,8 @@ import HomePage from '@/components/HomePage'
 import ChatRoom from '@/components/ChatRoom'
 import useWebSocket from '@/hooks/useWebSocket'
 import { getRandomDefaultAvatar } from '@/utils/avatarUtils'
+import { Toaster } from '@/components/ui/toaster'
+import { toast } from '@/hooks/use-toast'
 
 function App() {
   const [view, setView] = useState('home') // home, chat
@@ -69,14 +71,22 @@ function App() {
     },
     onError: (data) => {
       setIsConnecting(false)
-      alert(data.message)
+      toast({
+        variant: "destructive",
+        title: "错误",
+        description: data.message,
+      })
     }
   })
 
   // 创建房间
   const handleCreateRoom = () => {
     if (!userName.trim()) {
-      alert('请输入用户名')
+      toast({
+        variant: "destructive",
+        title: "提示",
+        description: "请输入用户名",
+      })
       return
     }
     
@@ -117,12 +127,20 @@ function App() {
   // 加入房间
   const handleJoinRoom = () => {
     if (!userName.trim()) {
-      alert('请输入用户名')
+      toast({
+        variant: "destructive",
+        title: "提示",
+        description: "请输入用户名",
+      })
       return
     }
     
     if (!roomCode.trim()) {
-      alert('请输入房间码')
+      toast({
+        variant: "destructive",
+        title: "提示",
+        description: "请输入房间码",
+      })
       return
     }
     
@@ -211,6 +229,7 @@ function App() {
   }
 
   return (
+    <>
     <div className="min-h-screen w-full flex items-center justify-center">
       {view === 'home' && (
         <HomePage
@@ -249,6 +268,8 @@ function App() {
         />
       )}
     </div>
+    <Toaster />
+    </>
   )
 }
 

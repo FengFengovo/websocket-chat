@@ -15,6 +15,7 @@ import { MessageCircle, Users, Send, LogOut } from 'lucide-react'
 import MessageList from './MessageList'
 import UserList from './UserList'
 import FileUpload from './FileUpload'
+import { toast } from '@/hooks/use-toast'
 
 export default function ChatRoom({ 
   currentRoomCode, 
@@ -45,7 +46,11 @@ export default function ChatRoom({
         if (file) {
           // 检查文件大小（限制为1GB）
           if (file.size > 1024 * 1024 * 1024) {
-            alert('文件大小不能超过1GB')
+            toast({
+              variant: "destructive",
+              title: "错误",
+              description: "文件大小不能超过1GB",
+            })
             return
           }
 
@@ -66,7 +71,11 @@ export default function ChatRoom({
           }
           
           reader.onerror = () => {
-            alert('图片读取失败，请重试')
+            toast({
+              variant: "destructive",
+              title: "错误",
+              description: "图片读取失败，请重试",
+            })
           }
           
           reader.readAsDataURL(file)

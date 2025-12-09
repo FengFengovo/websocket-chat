@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 're
 import { Button } from '@/components/ui/button'
 import { Paperclip, X, FileText, Image as ImageIcon, File } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
+import { toast } from '@/hooks/use-toast'
 
 const FileUpload = forwardRef(({ onFileSelect, disabled }, ref) => {
   const [selectedFile, setSelectedFile] = useState(null)
@@ -36,7 +37,11 @@ const FileUpload = forwardRef(({ onFileSelect, disabled }, ref) => {
     if (file) {
       // 检查文件大小（限制为1GB）
       if (file.size > 1024 * 1024 * 1024) {
-        alert('文件大小不能超过1GB')
+        toast({
+          variant: "destructive",
+          title: "错误",
+          description: "文件大小不能超过1GB",
+        })
         return
       }
 
@@ -92,7 +97,11 @@ const FileUpload = forwardRef(({ onFileSelect, disabled }, ref) => {
           }
           
           reader.onerror = () => {
-            alert('文件读取失败，请重试')
+            toast({
+              variant: "destructive",
+              title: "错误",
+              description: "文件读取失败，请重试",
+            })
             setIsUploading(false)
             setUploadProgress(0)
           }
@@ -144,14 +153,22 @@ const FileUpload = forwardRef(({ onFileSelect, disabled }, ref) => {
           }
           
           reader.onerror = () => {
-            alert('文件读取失败，请重试')
+            toast({
+              variant: "destructive",
+              title: "错误",
+              description: "文件读取失败，请重试",
+            })
             setIsUploading(false)
             setUploadProgress(0)
           }
         }
       } catch (error) {
         console.error('文件上传失败:', error)
-        alert('文件上传失败，请重试')
+        toast({
+          variant: "destructive",
+          title: "错误",
+          description: "文件上传失败，请重试",
+        })
         setIsUploading(false)
         setUploadProgress(0)
       }

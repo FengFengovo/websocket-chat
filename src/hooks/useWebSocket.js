@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react'
+import { toast } from './use-toast'
 
 export default function useWebSocket({
     onRoomCreated,
@@ -26,7 +27,11 @@ export default function useWebSocket({
             if (ws.readyState !== WebSocket.OPEN) {
                 ws.close()
                 console.error('WebSocket 连接超时')
-                alert('连接服务器超时，请检查网络连接或稍后重试')
+                toast({
+                    variant: "destructive",
+                    title: "连接超时",
+                    description: "连接服务器超时，请检查网络连接或稍后重试",
+                })
             }
         }, 30000)
 
@@ -89,7 +94,11 @@ export default function useWebSocket({
                 connectionTimeoutRef.current = null
             }
 
-            alert('连接服务器失败，请确保服务器正在运行\n\n可能的原因：\n1. 服务器正在启动（首次访问需要等待30秒）\n2. 网络连接问题\n3. 服务器维护中')
+            toast({
+                variant: "destructive",
+                title: "连接失败",
+                description: "连接服务器失败，请确保服务器正在运行。可能的原因：1. 服务器正在启动（首次访问需要等待30秒） 2. 网络连接问题 3. 服务器维护中",
+            })
         }
 
         wsRef.current = ws
