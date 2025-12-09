@@ -87,6 +87,7 @@ export default function HomePage({
                   onChange={(e) => setRoomPassword(e.target.value)}
                   maxLength={20}
                   className="h-10"
+                  autoComplete="new-password"
                 />
               </div>
               
@@ -133,6 +134,7 @@ export default function HomePage({
                   onChange={(e) => setJoinPassword(e.target.value)}
                   maxLength={20}
                   className="h-10"
+                  autoComplete="current-password"
                 />
               </div>
               
