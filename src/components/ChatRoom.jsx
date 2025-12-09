@@ -269,7 +269,7 @@ export default function ChatRoom({
                   onSendMessage(e)
                 }
               }}
-              className="flex-1 min-h-[40px] max-h-[120px] sm:min-h-[48px] sm:max-h-[150px] text-sm sm:text-base px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              className="flex-1 min-h-[60px] max-h-[180px] sm:min-h-[80px] sm:max-h-[240px] text-sm sm:text-base px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               rows="1"
               style={{
                 lineHeight: '1.5',
