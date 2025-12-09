@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Camera, RefreshCw } from 'lucide-react'
 import { getRandomDefaultAvatar } from '@/utils/avatarUtils'
-import { toast } from '@/hooks/use-toast'
+import { showAlert } from '@/stores/alertStore'
 
 export default function AvatarUpload({ userName, userAvatar, onAvatarChange, isCustomAvatar, setIsCustomAvatar }) {
   const fileInputRef = useRef(null)
@@ -12,21 +12,13 @@ export default function AvatarUpload({ userName, userAvatar, onAvatarChange, isC
     if (file) {
       // 检查文件大小（限制为2MB）
       if (file.size > 2 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "错误",
-          description: "图片大小不能超过2MB",
-        })
+        showAlert("错误", "图片大小不能超过2MB", "destructive")
         return
       }
       
       // 检查文件类型
       if (!file.type.startsWith('image/')) {
-        toast({
-          variant: "destructive",
-          title: "错误",
-          description: "请选择图片文件",
-        })
+        showAlert("错误", "请选择图片文件", "destructive")
         return
       }
       

@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react'
-import { toast } from './use-toast'
+import { showAlert } from '@/stores/alertStore'
 
 export default function useWebSocket({
     onRoomCreated,
@@ -27,11 +27,7 @@ export default function useWebSocket({
             if (ws.readyState !== WebSocket.OPEN) {
                 ws.close()
                 console.error('WebSocket 连接超时')
-                toast({
-                    variant: "destructive",
-                    title: "连接超时",
-                    description: "连接服务器超时，请检查网络连接或稍后重试",
-                })
+                showAlert("连接超时", "连接服务器超时，请检查网络连接或稍后重试", "destructive")
             }
         }, 30000)
 
@@ -94,11 +90,7 @@ export default function useWebSocket({
                 connectionTimeoutRef.current = null
             }
 
-            toast({
-                variant: "destructive",
-                title: "连接失败",
-                description: "连接服务器失败，请确保服务器正在运行。可能的原因：1. 服务器正在启动（首次访问需要等待30秒） 2. 网络连接问题 3. 服务器维护中",
-            })
+            showAlert("连接失败", "连接服务器失败，请确保服务器正在运行。可能的原因：1. 服务器正在启动（首次访问需要等待30秒） 2. 网络连接问题 3. 服务器维护中", "destructive")
         }
 
         wsRef.current = ws

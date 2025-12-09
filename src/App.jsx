@@ -3,8 +3,8 @@ import HomePage from '@/components/HomePage'
 import ChatRoom from '@/components/ChatRoom'
 import useWebSocket from '@/hooks/useWebSocket'
 import { getRandomDefaultAvatar } from '@/utils/avatarUtils'
-import { Toaster } from '@/components/ui/toaster'
-import { toast } from '@/hooks/use-toast'
+import { AlertContainer } from '@/components/AlertContainer'
+import { showAlert } from '@/stores/alertStore'
 
 function App() {
   const [view, setView] = useState('home') // home, chat
@@ -71,22 +71,14 @@ function App() {
     },
     onError: (data) => {
       setIsConnecting(false)
-      toast({
-        variant: "destructive",
-        title: "错误",
-        description: data.message,
-      })
+      showAlert("错误", data.message, "destructive")
     }
   })
 
   // 创建房间
   const handleCreateRoom = () => {
     if (!userName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "提示",
-        description: "请输入用户名",
-      })
+      showAlert("提示", "请输入用户名", "destructive")
       return
     }
     
@@ -127,20 +119,12 @@ function App() {
   // 加入房间
   const handleJoinRoom = () => {
     if (!userName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "提示",
-        description: "请输入用户名",
-      })
+      showAlert("提示", "请输入用户名", "destructive")
       return
     }
     
     if (!roomCode.trim()) {
-      toast({
-        variant: "destructive",
-        title: "提示",
-        description: "请输入房间码",
-      })
+      showAlert("提示", "请输入房间码", "destructive")
       return
     }
     
@@ -268,7 +252,7 @@ function App() {
         />
       )}
     </div>
-    <Toaster />
+    <AlertContainer />
     </>
   )
 }
