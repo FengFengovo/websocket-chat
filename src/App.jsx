@@ -1,27 +1,61 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import HomePage from '@/components/HomePage'
 import ChatRoom from '@/components/ChatRoom'
 import useWebSocket from '@/hooks/useWebSocket'
 import { getRandomDefaultAvatar } from '@/utils/avatarUtils'
 import { AlertContainer } from '@/components/AlertContainer'
 import { showAlert } from '@/stores/alertStore'
+import { 
+  getUserName, 
+  saveUserName, 
+  getLastRoomCode, 
+  saveLastRoomCode,
+  getRoomPassword,
+  saveRoomPassword,
+  getUserAvatar,
+  saveUserAvatar,
+  getIsCustomAvatar,
+  saveIsCustomAvatar
+} from '@/utils/storage'
 
 function App() {
   const [view, setView] = useState('home') // home, chat
-  const [userName, setUserName] = useState('')
-  const [roomCode, setRoomCode] = useState('')
+  const [userName, setUserName] = useState(() => getUserName()) // 从本地存储读取
+  const [roomCode, setRoomCode] = useState(() => getLastRoomCode()) // 从本地存储读取
   const [customRoomCode, setCustomRoomCode] = useState('') // 自定义房间号
-  const [roomPassword, setRoomPassword] = useState('') // 创建房间时的密码
-  const [joinPassword, setJoinPassword] = useState('') // 加入房间时的密码
+  const [roomPassword, setRoomPassword] = useState(() => getRoomPassword()) // 从本地存储读取
+  const [joinPassword, setJoinPassword] = useState(() => getRoomPassword()) // 从本地存储读取
   const [currentRoomCode, setCurrentRoomCode] = useState('')
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [users, setUsers] = useState([])
   const [userId] = useState(() => Math.random().toString(36).substring(7))
-  const [userAvatar, setUserAvatar] = useState(() => getRandomDefaultAvatar()) // 用户头像，默认随机选择
-  const [isCustomAvatar, setIsCustomAvatar] = useState(false) // 标记是否为用户自定义头像
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const savedAvatar = getUserAvatar()
+    return savedAvatar || getRandomDefaultAvatar()
+  }) // 用户头像，优先从本地存储读取
+  const [isCustomAvatar, setIsCustomAvatar] = useState(() => getIsCustomAvatar()) // 从本地存储读取
   const fileUploadRef = useRef(null) // FileUpload组件的ref
   const [isConnecting, setIsConnecting] = useState(false) // 连接状态
+
+  // 监听用户名变化，自动保存到本地存储
+  useEffect(() => {
+    if (userName.trim()) {
+      saveUserName(userName)
+    }
+  }, [userName])
+
+  // 监听头像变化，自动保存到本地存储
+  useEffect(() => {
+    if (userAvatar) {
+      saveUserAvatar(userAvatar)
+    }
+  }, [userAvatar])
+
+  // 监听头像类型变化，自动保存到本地存储
+  useEffect(() => {
+    saveIsCustomAvatar(isCustomAvatar)
+  }, [isCustomAvatar])
 
   // WebSocket Hook
   const { connect, send, close } = useWebSocket({
@@ -86,6 +120,14 @@ function App() {
       return // 防止重复点击
     }
     
+    // 保存房间信息到本地存储
+    if (customRoomCode.trim()) {
+      saveLastRoomCode(customRoomCode.trim())
+    }
+    if (roomPassword.trim()) {
+      saveRoomPassword(roomPassword.trim())
+    }
+    
     setIsConnecting(true)
     const ws = connect()
     
@@ -130,6 +172,12 @@ function App() {
     
     if (isConnecting) {
       return // 防止重复点击
+    }
+    
+    // 保存房间信息到本地存储
+    saveLastRoomCode(roomCode.trim())
+    if (joinPassword.trim()) {
+      saveRoomPassword(joinPassword.trim())
     }
     
     setIsConnecting(true)
