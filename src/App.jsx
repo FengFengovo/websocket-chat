@@ -42,8 +42,12 @@ function App() {
   const [typingUsers, setTypingUsers] = useState(new Map()) // 正在输入的用户
   const typingTimeoutRef = useRef(new Map()) // 输入超时定时器
   const [theme, setTheme] = useState(() => getTheme()) // 主题状态
-  const [notificationEnabled, setNotificationEnabled] = useState(false) // 通知是否启用
+  const [notificationEnabled, setNotificationEnabled] = useState(() => {
+    // 检查是否已经授权过通知权限
+    return 'Notification' in window && Notification.permission === 'granted'
+  }) // 通知是否启用
   const isWindowFocused = useRef(true) // 窗口是否聚焦
+  const inputTimeoutRef = useRef(null) // 输入防抖定时器
 
   // 监听用户名变化，自动保存到本地存储
   useEffect(() => {
@@ -164,11 +168,19 @@ function App() {
       })
       
       // 如果不是自己发送的消息，且窗口未聚焦，发送通知
+      console.log('消息通知检查:', {
+        isOtherUser: data.userId !== userId,
+        notificationEnabled,
+        isWindowFocused: isWindowFocused.current,
+        shouldNotify: data.userId !== userId && notificationEnabled && !isWindowFocused.current
+      })
+      
       if (data.userId !== userId && notificationEnabled && !isWindowFocused.current) {
         const messagePreview = data.file 
           ? `[${data.file.type.startsWith('image/') ? '图片' : '文件'}]` 
           : data.message.substring(0, 50)
         
+        console.log('发送通知:', `${data.userName} 发来新消息`, messagePreview)
         sendNotification(`${data.userName} 发来新消息`, {
           body: messagePreview,
           tag: 'chat-message'
@@ -330,12 +342,25 @@ function App() {
   const handleInputChange = (value) => {
     setInputMessage(value)
     
+    // 清除之前的定时器
+    if (inputTimeoutRef.current) {
+      clearTimeout(inputTimeoutRef.current)
+    }
+    
     // 发送正在输入状态
     if (value.trim()) {
       send({
         type: 'typing',
         isTyping: true
       })
+      
+      // 1秒后如果没有新的输入，发送停止输入状态
+      inputTimeoutRef.current = setTimeout(() => {
+        send({
+          type: 'typing',
+          isTyping: false
+        })
+      }, 1000)
     } else {
       send({
         type: 'typing',
