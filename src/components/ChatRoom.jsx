@@ -276,13 +276,12 @@ export default function ChatRoom({
                 scrollbarWidth: 'thin'
               }}
             />
-            <Button 
+            <button 
               type="submit" 
-              size="sm"
-              className="absolute right-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 h-auto text-sm"
+              className="absolute right-2 bottom-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 text-sm font-medium transition-colors"
             >
               发送
-            </Button>
+            </button>
           </div>
         </form>
       </div>
