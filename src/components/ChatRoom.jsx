@@ -172,7 +172,7 @@ export default function ChatRoom({
             <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <h2 className="text-lg sm:text-2xl font-bold">房间码: {currentRoomCode}</h2>
+            <h2 className="text-lg sm:text-l font-bold">房间码: {currentRoomCode}</h2>
             <p className="text-xs sm:text-sm text-blue-100 dark:text-gray-300 flex items-center gap-1 sm:gap-2">
               <Users className="w-3 h-3 sm:w-4 sm:h-4" />
               {users.length} 人在线
@@ -256,7 +256,7 @@ export default function ChatRoom({
         
         {/* 消息输入框 */}
         <form onSubmit={onSendMessage}>
-          <div className="flex gap-2 sm:gap-3 items-end">
+          <div className="relative">
             <textarea
               placeholder="输入消息或粘贴图片..."
               value={inputMessage}
@@ -269,7 +269,7 @@ export default function ChatRoom({
                   onSendMessage(e)
                 }
               }}
-              className="flex-1 min-h-[60px] max-h-[180px] sm:min-h-[80px] sm:max-h-[240px] text-sm sm:text-base px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              className="w-full min-h-[60px] max-h-[180px] sm:min-h-[80px] sm:max-h-[240px] text-sm sm:text-base px-3 py-2 pb-12 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               rows="1"
               style={{
                 lineHeight: '1.5',
@@ -278,11 +278,10 @@ export default function ChatRoom({
             />
             <Button 
               type="submit" 
-              size="default"
-              className="bg-blue-600 hover:bg-blue-700 h-10 sm:h-12 px-3 sm:px-4 flex-shrink-0"
+              size="sm"
+              className="absolute right-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 h-auto text-sm"
             >
-              <Send className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
-              <span className="hidden sm:inline">发送</span>
+              发送
             </Button>
           </div>
         </form>
