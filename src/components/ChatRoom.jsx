@@ -256,19 +256,30 @@ export default function ChatRoom({
         
         {/* 消息输入框 */}
         <form onSubmit={onSendMessage}>
-          <div className="flex gap-2 sm:gap-3">
-            <Input
-              type="text"
+          <div className="flex gap-2 sm:gap-3 items-end">
+            <textarea
               placeholder="输入消息或粘贴图片..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onPaste={handlePaste}
-              className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
+              onKeyDown={(e) => {
+                // 按Enter发送，Shift+Enter换行
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  onSendMessage(e)
+                }
+              }}
+              className="flex-1 min-h-[40px] max-h-[120px] sm:min-h-[48px] sm:max-h-[150px] text-sm sm:text-base px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              rows="1"
+              style={{
+                lineHeight: '1.5',
+                scrollbarWidth: 'thin'
+              }}
             />
             <Button 
               type="submit" 
               size="default"
-              className="bg-blue-600 hover:bg-blue-700 h-10 sm:h-12 px-3 sm:px-4"
+              className="bg-blue-600 hover:bg-blue-700 h-10 sm:h-12 px-3 sm:px-4 flex-shrink-0"
             >
               <Send className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
               <span className="hidden sm:inline">发送</span>
