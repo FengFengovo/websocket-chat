@@ -185,17 +185,8 @@ export default function ChatRoom({
             variant="ghost"
             size="icon"
             onClick={onEnableNotification}
-            onDoubleClick={() => {
-              // 双击测试通知
-              if (notificationEnabled) {
-                new Notification('测试通知', {
-                  body: '如果你看到这条通知，说明通知功能正常工作！',
-                  icon: '/vite.svg'
-                })
-              }
-            }}
             className="text-white hover:bg-white/20 dark:hover:bg-white/10 h-8 w-8 sm:h-10 sm:w-10"
-            title={notificationEnabled ? "通知已启用（双击测试通知）" : "启用通知"}
+            title={notificationEnabled ? "通知已启用" : "启用通知"}
           >
             {notificationEnabled ? <Bell className="w-4 h-4 sm:w-5 sm:h-5" /> : <BellOff className="w-4 h-4 sm:w-5 sm:h-5" />}
           </Button>
