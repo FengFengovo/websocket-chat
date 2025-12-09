@@ -166,7 +166,7 @@ export default function ChatRoom({
         </div>
       )}
       {/* 聊天室头部 */}
-      <div className="bg-blue-600 dark:bg-gray-900 text-white p-3 sm:p-6 flex items-center justify-between transition-colors duration-300">
+      <div className="bg-pink-400 dark:bg-gray-900 text-white sm:p-6 flex items-center justify-between transition-colors duration-300">
         <div className="flex items-center gap-2 sm:gap-4">
           <div className="bg-white/20 dark:bg-white/10 p-1.5 sm:p-2 rounded-lg">
             <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -278,7 +278,7 @@ export default function ChatRoom({
             />
             <button 
               type="submit" 
-              className="absolute right-2 bottom-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 text-sm font-medium transition-colors"
+              className="absolute right-2 bottom-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 text-sm font-medium transition-colors"
             >
               发送
             </button>

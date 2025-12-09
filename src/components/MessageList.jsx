@@ -193,7 +193,7 @@ export default function MessageList({ messages, userId }) {
                       </div>
                     ) : msg.message ? (
                       /* 普通文本消息 */
-                      <div className="px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base">
+                      <div className="px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
                         {msg.message}
                       </div>
                     ) : null}
