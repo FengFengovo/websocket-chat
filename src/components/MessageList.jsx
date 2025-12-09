@@ -111,7 +111,7 @@ export default function MessageList({ messages, userId }) {
                     </span>
                   </div>
                   <div
-                    className={`rounded-2xl shadow-sm ${
+                    className={`rounded-2xl shadow-sm overflow-hidden ${
                       msg.userId === userId
                         ? 'bg-blue-600 text-white rounded-tr-sm'
                         : 'bg-white text-gray-800 rounded-tl-sm'
@@ -193,7 +193,7 @@ export default function MessageList({ messages, userId }) {
                       </div>
                     ) : msg.message ? (
                       /* 普通文本消息 */
-                      <div className="px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
+                      <div className="px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-all max-w-full overflow-hidden">
                         {msg.message}
                       </div>
                     ) : null}
