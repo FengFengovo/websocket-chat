@@ -78,8 +78,8 @@ export default function MessageList({ messages, userId }) {
   }, [messages])
 
   return (
-    <ScrollArea className="flex-1 p-6 bg-gray-50">
-      <div className="space-y-4">
+    <ScrollArea className="flex-1 p-3 sm:p-6 bg-gray-50">
+      <div className="space-y-3 sm:space-y-4">
         {messages.map((msg, index) => (
           <div key={index}>
             {msg.type === 'system' ? (
@@ -89,9 +89,9 @@ export default function MessageList({ messages, userId }) {
                 </Badge>
               </div>
             ) : (
-              <div className={`flex gap-2 ${msg.userId === userId ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex gap-1.5 sm:gap-2 ${msg.userId === userId ? 'justify-end' : 'justify-start'}`}>
                 {msg.userId !== userId && (
-                  <Avatar className="w-8 h-8 mt-6">
+                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8 mt-5 sm:mt-6 flex-shrink-0">
                     {msg.userAvatar ? (
                       <AvatarImage src={msg.userAvatar} alt={msg.userName} />
                     ) : (
@@ -101,12 +101,12 @@ export default function MessageList({ messages, userId }) {
                     )}
                   </Avatar>
                 )}
-                <div className={`max-w-[70%] space-y-1 ${msg.userId === userId ? 'items-end' : 'items-start'}`}>
-                  <div className="flex items-center gap-2 px-1">
-                    <span className="text-xs font-medium text-gray-600">
+                <div className={`max-w-[85%] sm:max-w-[70%] space-y-1 ${msg.userId === userId ? 'items-end' : 'items-start'}`}>
+                  <div className="flex items-center gap-1 sm:gap-2 px-1">
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-600">
                       {msg.userName}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-[10px] sm:text-xs text-gray-400">
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>
@@ -119,7 +119,7 @@ export default function MessageList({ messages, userId }) {
                   >
                     {/* 如果有文件，显示文件内容 */}
                     {msg.file && msg.file.data ? (
-                      <div className="p-4 space-y-3 min-w-[250px]">
+                      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 min-w-[200px] sm:min-w-[250px]">
                         {/* 如果是图片，显示图片预览 */}
                         {msg.file.type && msg.file.type.startsWith('image/') ? (
                           <div className="space-y-3">
@@ -203,14 +203,14 @@ export default function MessageList({ messages, userId }) {
                       </div>
                     ) : msg.message ? (
                       /* 普通文本消息 */
-                      <div className="px-4 py-3">
+                      <div className="px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base">
                         {msg.message}
                       </div>
                     ) : null}
                   </div>
                 </div>
                 {msg.userId === userId && (
-                  <Avatar className="w-8 h-8 mt-6">
+                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8 mt-5 sm:mt-6 flex-shrink-0">
                     {msg.userAvatar ? (
                       <AvatarImage src={msg.userAvatar} alt={msg.userName} />
                     ) : (

@@ -32,7 +32,7 @@ const defaultAvatars = [
  */
 export function getRandomDefaultAvatar() {
     const randomIndex = Math.floor(Math.random() * defaultAvatars.length)
-    return `/src/icon/${defaultAvatars[randomIndex]}`
+    return `/icon/${defaultAvatars[randomIndex]}`
 }
 
 /**
@@ -48,5 +48,5 @@ export function getDefaultAvatarByUserId(userId) {
         hash = hash & hash // 转换为32位整数
     }
     const index = Math.abs(hash) % defaultAvatars.length
-    return `/src/icon/${defaultAvatars[index]}`
+    return `/icon/${defaultAvatars[index]}`
 }

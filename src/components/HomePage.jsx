@@ -17,21 +17,21 @@ export default function HomePage({
   onJoinRoom 
 }) {
   return (
-    <Card className="w-full max-w-md shadow-2xl">
-      <CardHeader className="text-center space-y-2">
+    <Card className="w-full max-w-md shadow-2xl mx-2 sm:mx-0">
+      <CardHeader className="text-center space-y-2 p-4 sm:p-6">
         <div className="flex justify-center mb-2">
           <div className="bg-blue-600 p-3 rounded-full">
             <MessageCircle className="w-8 h-8 text-white" />
           </div>
         </div>
-        <CardTitle className="text-3xl font-bold text-blue-600">
+        <CardTitle className="text-2xl sm:text-3xl font-bold text-blue-600">
           实时聊天室
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="text-sm sm:text-base">
           无需登录，创建或加入房间即可开始聊天
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 sm:p-6">
         {/* 头像选择 */}
         <AvatarUpload 
           userName={userName}
