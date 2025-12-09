@@ -43,8 +43,33 @@ export default function ChatRoom({
         
         const file = item.getAsFile()
         if (file) {
-          // 直接调用文件发送函数
-          onSendFile(file)
+          // 检查文件大小（限制为1GB）
+          if (file.size > 1024 * 1024 * 1024) {
+            alert('文件大小不能超过1GB')
+            return
+          }
+
+          // 将文件转换为base64格式
+          const reader = new FileReader()
+          
+          reader.onloadend = () => {
+            const fileId = Date.now() + '_' + Math.random().toString(36).substring(7)
+            
+            // 发送文件数据
+            onSendFile({
+              fileId,
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              data: reader.result
+            })
+          }
+          
+          reader.onerror = () => {
+            alert('图片读取失败，请重试')
+          }
+          
+          reader.readAsDataURL(file)
         }
         break
       }
