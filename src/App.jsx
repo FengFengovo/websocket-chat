@@ -50,8 +50,7 @@ function App() {
   const inputTimeoutRef = useRef(null) // 输入防抖定时器
   const titleFlashInterval = useRef(null) // 标题闪动定时器
   const originalTitle = useRef(document.title) // 原始标题
-  const [unreadCount, setUnreadCount] = useState(0) // 未读消息数
-  const unreadCountRef = useRef(0) // 未读消息数的ref，用于在定时器中获取最新值
+  const hasUnreadMessages = useRef(false) // 是否有未读消息
 
   // 监听用户名变化，自动保存到本地存储
   useEffect(() => {
@@ -98,8 +97,7 @@ function App() {
         titleFlashInterval.current = null
       }
       document.title = originalTitle.current
-      setUnreadCount(0) // 清空未读数
-      unreadCountRef.current = 0 // 同步更新ref
+      hasUnreadMessages.current = false // 清空未读标记
     }
     const handleBlur = () => {
       isWindowFocused.current = false
@@ -122,11 +120,11 @@ function App() {
     // 如果已经在闪动，不重复启动
     if (titleFlashInterval.current) return
     
+    hasUnreadMessages.current = true
     let isOriginal = true
     titleFlashInterval.current = setInterval(() => {
       if (isOriginal) {
-        // 使用ref获取最新的未读数
-        document.title = `(${unreadCountRef.current}) 💬 新消息提醒`
+        document.title = '💬 新消息提醒'
       } else {
         document.title = originalTitle.current
       }
@@ -208,13 +206,6 @@ function App() {
       })
       
       if (data.userId !== userId && !isWindowFocused.current) {
-        // 增加未读数
-        setUnreadCount(prev => {
-          const newCount = prev + 1
-          unreadCountRef.current = newCount // 同步更新ref
-          return newCount
-        })
-        
         // 开始标题闪动
         startTitleFlash()
         
@@ -474,8 +465,7 @@ function App() {
       titleFlashInterval.current = null
     }
     document.title = originalTitle.current
-    setUnreadCount(0)
-    unreadCountRef.current = 0 // 同步更新ref
+    hasUnreadMessages.current = false // 清空未读标记
   }
 
   return (
