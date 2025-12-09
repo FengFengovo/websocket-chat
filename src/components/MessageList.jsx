@@ -137,7 +137,7 @@ export default function MessageList({ messages, userId }) {
                               onLoad={() => checkImageDimensions(msg.file.data, index)}
                             />
                             {/* 悬停提示 */}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center pointer-events-none">
                               <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-70 px-3 py-1.5 rounded-full">
                                 <p className="text-white text-xs flex items-center gap-1">
                                   <ImageIcon className="w-3 h-3" />
