@@ -9,6 +9,7 @@ export default function useWebSocket({
     onError
 }) {
     const wsRef = useRef(null)
+    const connectionTimeoutRef = useRef(null)
 
     // 连接 WebSocket
     const connect = useCallback(() => {
@@ -17,10 +18,25 @@ export default function useWebSocket({
             ? 'wss://websocket-chat-cwkj.onrender.com' // 生产环境
             : 'ws://localhost:3001' // 开发环境
 
+        console.log('正在连接 WebSocket:', wsUrl)
         const ws = new WebSocket(wsUrl)
+
+        // 设置连接超时（30秒）
+        connectionTimeoutRef.current = setTimeout(() => {
+            if (ws.readyState !== WebSocket.OPEN) {
+                ws.close()
+                console.error('WebSocket 连接超时')
+                alert('连接服务器超时，请检查网络连接或稍后重试')
+            }
+        }, 30000)
 
         ws.onopen = () => {
             console.log('WebSocket 连接成功')
+            // 清除超时定时器
+            if (connectionTimeoutRef.current) {
+                clearTimeout(connectionTimeoutRef.current)
+                connectionTimeoutRef.current = null
+            }
         }
 
         ws.onmessage = (event) => {
@@ -53,13 +69,27 @@ export default function useWebSocket({
             }
         }
 
-        ws.onclose = () => {
-            console.log('WebSocket 连接关闭')
+        ws.onclose = (event) => {
+            console.log('WebSocket 连接关闭', event.code, event.reason)
+            // 清除超时定时器
+            if (connectionTimeoutRef.current) {
+                clearTimeout(connectionTimeoutRef.current)
+                connectionTimeoutRef.current = null
+            }
         }
 
         ws.onerror = (error) => {
             console.error('WebSocket 错误:', error)
-            alert('连接服务器失败，请确保服务器正在运行')
+            console.error('WebSocket readyState:', ws.readyState)
+            console.error('尝试连接的 URL:', wsUrl)
+
+            // 清除超时定时器
+            if (connectionTimeoutRef.current) {
+                clearTimeout(connectionTimeoutRef.current)
+                connectionTimeoutRef.current = null
+            }
+
+            alert('连接服务器失败，请确保服务器正在运行\n\n可能的原因：\n1. 服务器正在启动（首次访问需要等待30秒）\n2. 网络连接问题\n3. 服务器维护中')
         }
 
         wsRef.current = ws

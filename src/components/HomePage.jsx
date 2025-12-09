@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { MessageCircle, Plus, DoorOpen } from 'lucide-react'
+import { MessageCircle, Plus, DoorOpen, Loader2 } from 'lucide-react'
 import AvatarUpload from './AvatarUpload'
 
 export default function HomePage({ 
@@ -14,7 +14,8 @@ export default function HomePage({
   isCustomAvatar,
   setIsCustomAvatar,
   onCreateRoom, 
-  onJoinRoom 
+  onJoinRoom,
+  isConnecting = false
 }) {
   return (
     <Card className="w-full max-w-md shadow-2xl mx-2 sm:mx-0">
@@ -56,9 +57,19 @@ export default function HomePage({
         <Button 
           className="w-full h-12 text-base bg-blue-600 hover:bg-blue-700"
           onClick={onCreateRoom}
+          disabled={isConnecting || !userName.trim()}
         >
-          <Plus className="w-5 h-5 mr-2" />
-          创建新房间
+          {isConnecting ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              连接中...
+            </>
+          ) : (
+            <>
+              <Plus className="w-5 h-5 mr-2" />
+              创建新房间
+            </>
+          )}
         </Button>
         
         <div className="relative">
@@ -86,9 +97,19 @@ export default function HomePage({
           variant="outline"
           className="w-full h-12 text-base border-2"
           onClick={onJoinRoom}
+          disabled={isConnecting || !userName.trim() || !roomCode.trim()}
         >
-          <DoorOpen className="w-5 h-5 mr-2" />
-          加入房间
+          {isConnecting ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              连接中...
+            </>
+          ) : (
+            <>
+              <DoorOpen className="w-5 h-5 mr-2" />
+              加入房间
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

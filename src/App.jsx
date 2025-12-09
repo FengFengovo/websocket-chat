@@ -16,15 +16,18 @@ function App() {
   const [userAvatar, setUserAvatar] = useState(() => getRandomDefaultAvatar()) // 用户头像，默认随机选择
   const [isCustomAvatar, setIsCustomAvatar] = useState(false) // 标记是否为用户自定义头像
   const fileUploadRef = useRef(null) // FileUpload组件的ref
+  const [isConnecting, setIsConnecting] = useState(false) // 连接状态
 
   // WebSocket Hook
   const { connect, send, close } = useWebSocket({
     onRoomCreated: (data) => {
+      setIsConnecting(false)
       setCurrentRoomCode(data.roomCode)
       setUsers(data.users)
       setView('chat')
     },
     onRoomJoined: (data) => {
+      setIsConnecting(false)
       setCurrentRoomCode(data.roomCode)
       setUsers(data.users)
       setView('chat')
@@ -62,6 +65,7 @@ function App() {
       }
     },
     onError: (data) => {
+      setIsConnecting(false)
       alert(data.message)
     }
   })
@@ -73,17 +77,36 @@ function App() {
       return
     }
     
-    connect()
+    if (isConnecting) {
+      return // 防止重复点击
+    }
+    
+    setIsConnecting(true)
+    const ws = connect()
     
     // 等待连接建立后发送创建房间消息
+    const checkConnection = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        clearInterval(checkConnection)
+        send({
+          type: 'create_room',
+          userId: userId,
+          userName: userName,
+          userAvatar: userAvatar
+        })
+      } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+        clearInterval(checkConnection)
+        setIsConnecting(false)
+      }
+    }, 100)
+    
+    // 30秒超时保护
     setTimeout(() => {
-      send({
-        type: 'create_room',
-        userId: userId,
-        userName: userName,
-        userAvatar: userAvatar
-      })
-    }, 500)
+      clearInterval(checkConnection)
+      if (isConnecting) {
+        setIsConnecting(false)
+      }
+    }, 30000)
   }
 
   // 加入房间
@@ -98,18 +121,37 @@ function App() {
       return
     }
     
-    connect()
+    if (isConnecting) {
+      return // 防止重复点击
+    }
+    
+    setIsConnecting(true)
+    const ws = connect()
     
     // 等待连接建立后发送加入房间消息
+    const checkConnection = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        clearInterval(checkConnection)
+        send({
+          type: 'join_room',
+          roomCode: roomCode.toUpperCase(),
+          userId: userId,
+          userName: userName,
+          userAvatar: userAvatar
+        })
+      } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+        clearInterval(checkConnection)
+        setIsConnecting(false)
+      }
+    }, 100)
+    
+    // 30秒超时保护
     setTimeout(() => {
-      send({
-        type: 'join_room',
-        roomCode: roomCode.toUpperCase(),
-        userId: userId,
-        userName: userName,
-        userAvatar: userAvatar
-      })
-    }, 500)
+      clearInterval(checkConnection)
+      if (isConnecting) {
+        setIsConnecting(false)
+      }
+    }, 30000)
   }
 
   // 发送消息
@@ -173,6 +215,7 @@ function App() {
           setIsCustomAvatar={setIsCustomAvatar}
           onCreateRoom={handleCreateRoom}
           onJoinRoom={handleJoinRoom}
+          isConnecting={isConnecting}
         />
       )}
       
