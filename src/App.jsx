@@ -48,6 +48,9 @@ function App() {
   }) // 通知是否启用
   const isWindowFocused = useRef(true) // 窗口是否聚焦
   const inputTimeoutRef = useRef(null) // 输入防抖定时器
+  const titleFlashInterval = useRef(null) // 标题闪动定时器
+  const originalTitle = useRef(document.title) // 原始标题
+  const [unreadCount, setUnreadCount] = useState(0) // 未读消息数
 
   // 监听用户名变化，自动保存到本地存储
   useEffect(() => {
@@ -88,6 +91,13 @@ function App() {
   useEffect(() => {
     const handleFocus = () => {
       isWindowFocused.current = true
+      // 窗口聚焦时停止标题闪动并恢复原标题
+      if (titleFlashInterval.current) {
+        clearInterval(titleFlashInterval.current)
+        titleFlashInterval.current = null
+      }
+      document.title = originalTitle.current
+      setUnreadCount(0) // 清空未读数
     }
     const handleBlur = () => {
       isWindowFocused.current = false
@@ -99,8 +109,27 @@ function App() {
     return () => {
       window.removeEventListener('focus', handleFocus)
       window.removeEventListener('blur', handleBlur)
+      if (titleFlashInterval.current) {
+        clearInterval(titleFlashInterval.current)
+      }
     }
   }, [])
+
+  // 开始标题闪动
+  const startTitleFlash = () => {
+    // 如果已经在闪动，不重复启动
+    if (titleFlashInterval.current) return
+    
+    let isOriginal = true
+    titleFlashInterval.current = setInterval(() => {
+      if (isOriginal) {
+        document.title = `(${unreadCount}) 💬 新消息提醒`
+      } else {
+        document.title = originalTitle.current
+      }
+      isOriginal = !isOriginal
+    }, 1000) // 每秒切换一次
+  }
 
   // 请求通知权限
   const handleEnableNotification = async () => {
@@ -167,24 +196,33 @@ function App() {
         return newMap
       })
       
-      // 如果不是自己发送的消息，且窗口未聚焦，发送通知
+      // 如果不是自己发送的消息，且窗口未聚焦，发送通知和标题闪动
       console.log('消息通知检查:', {
         isOtherUser: data.userId !== userId,
         notificationEnabled,
         isWindowFocused: isWindowFocused.current,
-        shouldNotify: data.userId !== userId && notificationEnabled && !isWindowFocused.current
+        shouldNotify: data.userId !== userId && !isWindowFocused.current
       })
       
-      if (data.userId !== userId && notificationEnabled && !isWindowFocused.current) {
-        const messagePreview = data.file 
-          ? `[${data.file.type.startsWith('image/') ? '图片' : '文件'}]` 
-          : data.message.substring(0, 50)
+      if (data.userId !== userId && !isWindowFocused.current) {
+        // 增加未读数
+        setUnreadCount(prev => prev + 1)
         
-        console.log('发送通知:', `${data.userName} 发来新消息`, messagePreview)
-        sendNotification(`${data.userName} 发来新消息`, {
-          body: messagePreview,
-          tag: 'chat-message'
-        })
+        // 开始标题闪动
+        startTitleFlash()
+        
+        // 发送通知（如果已启用）
+        if (notificationEnabled) {
+          const messagePreview = data.file 
+            ? `[${data.file.type.startsWith('image/') ? '图片' : '文件'}]` 
+            : data.message.substring(0, 50)
+          
+          console.log('发送通知:', `${data.userName} 发来新消息`, messagePreview)
+          sendNotification(`${data.userName} 发来新消息`, {
+            body: messagePreview,
+            tag: 'chat-message'
+          })
+        }
       }
       
       // 如果是文件消息且是自己发送的，通知FileUpload组件完成上传
@@ -423,6 +461,13 @@ function App() {
     setCustomRoomCode('')
     setRoomPassword('')
     setJoinPassword('')
+    // 停止标题闪动并恢复原标题
+    if (titleFlashInterval.current) {
+      clearInterval(titleFlashInterval.current)
+      titleFlashInterval.current = null
+    }
+    document.title = originalTitle.current
+    setUnreadCount(0)
   }
 
   return (
