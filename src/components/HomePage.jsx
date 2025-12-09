@@ -55,6 +55,7 @@ export default function HomePage({
             onChange={(e) => setUserName(e.target.value)}
             maxLength={20}
             className="h-10"
+            autoComplete="username"
           />
         </div>
         
@@ -75,6 +76,7 @@ export default function HomePage({
                   onChange={(e) => setCustomRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                   maxLength={12}
                   className="h-10 uppercase"
+                  autoComplete="off"
                 />
               </div>
               
@@ -122,6 +124,7 @@ export default function HomePage({
                   onChange={(e) => setRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                   maxLength={12}
                   className="h-10 uppercase"
+                  autoComplete="off"
                 />
               </div>
               
